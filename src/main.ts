@@ -6,8 +6,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const SwaggerOptions = new DocumentBuilder()
-    .setTitle('Realty')
-    .setDescription('부동산 서비스 API')
+    .setTitle('Digitron')
+    .setDescription('Digitron API Document')
     .setVersion('0.1')
     .build();
 
