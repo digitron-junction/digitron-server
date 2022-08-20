@@ -1,13 +1,31 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AppModule } from './app.module';
 import { loadConfig } from './config/config';
+import { LOGGER_FORMAT } from './config/constants';
+import * as morgan from 'morgan';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   await loadConfig();
 
   const app = await NestFactory.create(AppModule);
+
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+  app.enableCors({
+    credentials: true,
+  });
+  app.use(cookieParser());
+
+  app.use(
+    morgan(LOGGER_FORMAT, {
+      skip: (req) => {
+        return req.url.includes('/health-check') || req.url === '/';
+      },
+    }),
+  );
 
   const SwaggerOptions = new DocumentBuilder()
     .setTitle('Digitron')
