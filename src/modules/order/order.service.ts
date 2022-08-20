@@ -73,4 +73,23 @@ export class OrderService {
 
     return chagnedOrder;
   }
+
+  async getOrdersByStoreId(storeId: number) {
+    const orders = await this.prismaService.order.findMany({
+      where: {
+        product: {
+          storeId,
+        },
+        deletedAt: null,
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      include: {
+        product: true,
+      },
+    });
+
+    return orders;
+  }
 }

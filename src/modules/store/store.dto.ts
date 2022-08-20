@@ -12,3 +12,14 @@ export class GetStoreProductsDto {
   @IsNumber()
   storeId!: number;
 }
+
+export class GetStoreOrdersDto {
+  @ApiProperty({
+    description: 'store Id',
+    required: true,
+    type: Number,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  storeId!: number;
+}

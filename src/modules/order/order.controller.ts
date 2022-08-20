@@ -43,7 +43,7 @@ export class OrderController {
 
   @UseGuards(RequiredStoreUserGuard)
   @ApiHeader(requiredUserHeader)
-  @Put('/:orderId')
+  @Put('/:orderId/status')
   async changeOrderStatus(
     @Param() { orderId }: ChangeOrderStatusParamsDto,
     @Body() dto: ChangeOrderStatusBodyDto,

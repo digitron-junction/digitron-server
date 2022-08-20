@@ -1,9 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
+import { orderToDto } from '../order/order.dto';
+import { OrderService } from '../order/order.service';
 import { productEntityToDto } from '../product/product.dto';
 import { ProductService } from '../product/product.service';
-import { GetStoreProductsDto } from './store.dto';
+import { GetStoreOrdersDto, GetStoreProductsDto } from './store.dto';
 
 @ApiTags('Store')
 @Controller('/api/v1/stores')
@@ -11,6 +13,7 @@ export class StoreController {
   constructor(
     private readonly productService: ProductService,
     private readonly cloudflareService: CloudflareService,
+    private readonly orderService: OrderService,
   ) {}
 
   @ApiOperation({
@@ -28,6 +31,24 @@ export class StoreController {
               cloudflareService: this.cloudflareService,
               productService: this.productService,
             });
+          }),
+        ),
+      },
+    };
+  }
+
+  @ApiOperation({
+    summary: 'get all order by storeId',
+  })
+  @Get('/:storeId/orders')
+  async get(@Param() { storeId }: GetStoreOrdersDto) {
+    const orders = await this.orderService.getOrdersByStoreId(storeId);
+
+    return {
+      data: {
+        orders: await Promise.all(
+          orders.map(async (order) => {
+            return orderToDto(order);
           }),
         ),
       },
