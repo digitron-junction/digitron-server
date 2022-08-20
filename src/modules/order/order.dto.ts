@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { order, product } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsNumber } from 'class-validator';
+import { IsBoolean, IsNumber } from 'class-validator';
 import { z } from 'zod';
 
 export class CreateOrderDto {
@@ -44,3 +44,31 @@ const orderZodSchema = z.object({
 export const orderToDto = (order: order & { product: product }) => {
   return orderZodSchema.parse(order);
 };
+
+export class ChangeOrderStatusParamsDto {
+  @ApiProperty({
+    type: Number,
+    required: true,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  orderId!: number;
+}
+
+export class ChangeOrderStatusBodyDto {
+  @ApiProperty({
+    required: true,
+    type: Boolean,
+  })
+  @Type(() => Boolean)
+  @IsBoolean()
+  isPaid!: boolean;
+
+  @ApiProperty({
+    required: true,
+    type: Boolean,
+  })
+  @Type(() => Boolean)
+  @IsBoolean()
+  isDeliveried!: boolean;
+}

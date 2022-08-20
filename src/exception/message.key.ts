@@ -9,6 +9,8 @@ const KeyMessage = {
   onlyStoreAccountAccess: 'only store account can access',
   productNotExists: 'product not exists',
   noPermissionToUpdateProduct: 'you cannot update product',
+  orderNotfound: 'order not found',
+  noPermissionToUpdateOrder: 'you cannot update order',
 };
 
 export type MessageKey = keyof typeof KeyMessage;

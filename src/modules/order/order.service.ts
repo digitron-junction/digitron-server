@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import {
+  NoPermissionToUpdateOrderException,
+  OrderNotfoundException,
+} from '~/exception/service-exception/order.exception';
 import { ProductNotExistsException } from '~/exception/service-exception/product.exception';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateOrderDto } from './order.dto';
+import { ChangeOrderStatusBodyDto, CreateOrderDto } from './order.dto';
 
 @Injectable()
 export class OrderService {
@@ -30,5 +34,43 @@ export class OrderService {
     });
 
     return order;
+  }
+
+  async changeOrderStatus(
+    dto: ChangeOrderStatusBodyDto & { orderId: number },
+    userStoreId: number,
+  ) {
+    const order = await this.prismaService.order.findFirst({
+      where: {
+        id: dto.orderId,
+        deletedAt: null,
+      },
+      include: {
+        product: true,
+      },
+    });
+
+    if (order === null) {
+      throw new OrderNotfoundException();
+    }
+
+    if (order.product.storeId !== userStoreId) {
+      throw new NoPermissionToUpdateOrderException();
+    }
+
+    const chagnedOrder = await this.prismaService.order.update({
+      where: {
+        id: dto.orderId,
+      },
+      data: {
+        isDeliveried: dto.isDeliveried,
+        isPaid: dto.isPaid,
+      },
+      include: {
+        product: true,
+      },
+    });
+
+    return chagnedOrder;
   }
 }
