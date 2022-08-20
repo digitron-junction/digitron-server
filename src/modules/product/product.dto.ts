@@ -67,6 +67,15 @@ export class CreateProductDto {
   })
   @IsString()
   descrption!: string;
+
+  @ApiProperty({
+    type: Number,
+    description: 'product stock',
+    required: true,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  stock!: number;
 }
 
 export const productDtoZodSchema = z.object({
@@ -150,4 +159,24 @@ export class DecrLikeDto {
   @Type(() => Number)
   @IsNumber()
   productId!: number;
+}
+
+export class ChangeProductStockParamsDto {
+  @ApiProperty({
+    description: 'product id',
+    required: true,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  productId!: number;
+}
+
+export class ChangeProductStockBodyDto {
+  @ApiProperty({
+    description: 'stock',
+    required: true,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  stock!: number;
 }

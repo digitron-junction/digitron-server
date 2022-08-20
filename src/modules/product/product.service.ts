@@ -40,6 +40,7 @@ export class ProductService {
         originalPrice: args.originalPrice,
         descrption: args.descrption,
         storeId: args.storeId,
+        stock: args.stock,
       },
       include: { store: true },
     });
@@ -170,5 +171,33 @@ export class ProductService {
     });
 
     return await this.getProductById(productId);
+  }
+
+  async changeProductStock({
+    productId,
+    stockCount,
+  }: {
+    productId: number;
+    stockCount: number;
+  }) {
+    const preProduct = await this.prismaService.product.findFirst({
+      where: { id: productId },
+    });
+
+    if (preProduct === null) {
+      throw new ProductNotExistsException();
+    }
+
+    return await this.prismaService.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        stock: stockCount,
+      },
+      include: {
+        store: true,
+      },
+    });
   }
 }

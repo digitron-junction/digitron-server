@@ -11,6 +11,8 @@ const KeyMessage = {
   noPermissionToUpdateProduct: 'you cannot update product',
   orderNotfound: 'order not found',
   noPermissionToUpdateOrder: 'you cannot update order',
+  reviewAlreadyExists: 'you already write review at this product',
+  noStock: 'no stock remain',
 };
 
 export type MessageKey = keyof typeof KeyMessage;

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   NoPermissionToUpdateOrderException,
+  NoStockException,
   OrderNotfoundException,
 } from '~/exception/service-exception/order.exception';
 import { ProductNotExistsException } from '~/exception/service-exception/product.exception';
@@ -19,6 +20,10 @@ export class OrderService {
       throw new ProductNotExistsException();
     }
 
+    if (product.stock < dto.quantity) {
+      throw new NoStockException();
+    }
+
     const order = await this.prismaService.order.create({
       data: {
         productId: dto.productId,
@@ -32,6 +37,15 @@ export class OrderService {
         product: true,
       },
     });
+
+    const updatedProduct = await this.prismaService.product.update({
+      where: { id: product.id },
+      data: {
+        stock: { decrement: dto.quantity },
+      },
+    });
+
+    order.product = updatedProduct;
 
     return order;
   }

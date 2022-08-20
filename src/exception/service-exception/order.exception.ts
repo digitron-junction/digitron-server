@@ -17,3 +17,12 @@ export class NoPermissionToUpdateOrderException extends ServiceException {
     });
   }
 }
+
+export class NoStockException extends ServiceException {
+  constructor() {
+    super({
+      code: 'badRequest',
+      messageKey: 'noStock',
+    });
+  }
+}

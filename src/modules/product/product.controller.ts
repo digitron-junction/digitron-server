@@ -16,6 +16,8 @@ import { RequiredUserGuard } from '~/guard/required-user.guard';
 import { RequiredStoreUserRequest } from '~/types/request';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
 import {
+  ChangeProductStockBodyDto,
+  ChangeProductStockParamsDto,
   CreateProductDto,
   DecrLikeDto,
   DeleteProductDto,
@@ -122,6 +124,28 @@ export class ProductController {
     const product = await this.productService.decrProductLike({
       userId: req.user.id,
       productId,
+    });
+
+    return {
+      data: {
+        product: await productEntityToDto(product, {
+          cloudflareService: this.cloudflareService,
+          productService: this.productService,
+        }),
+      },
+    };
+  }
+
+  @UseGuards(RequiredStoreUserGuard)
+  @ApiHeader(requiredUserHeader)
+  @Put('/:productId/change_stock')
+  async changeProductStock(
+    @Param() { productId }: ChangeProductStockParamsDto,
+    @Body() { stock }: ChangeProductStockBodyDto,
+  ) {
+    const product = await this.productService.changeProductStock({
+      productId,
+      stockCount: stock,
     });
 
     return {
