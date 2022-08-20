@@ -10,11 +10,12 @@ import {
 } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
-import { optionalUserHeader } from '~/config/constants';
+import { optionalUserHeader, requiredUserHeader } from '~/config/constants';
 import { UserKindEnum } from '~/entity/user.entity';
 import { InvalidSignUpArgumentException } from '~/exception/service-exception/user.exception';
 import { OptionalUserGuard } from '~/guard/optional-user.guard';
-import { OptionalUserRequest } from '~/types/request';
+import { RequiredUserGuard } from '~/guard/required-user.guard';
+import { OptionalUserRequest, RequiredUserRequest } from '~/types/request';
 import {
   authTokenToDto,
   GetOneUserDto,
@@ -78,6 +79,20 @@ export class UserController {
       data: {
         user: userEntityToDto(user),
         authToken: authTokenToDto(user),
+      },
+    };
+  }
+
+  @UseGuards(RequiredUserGuard)
+  @ApiOperation({
+    summary: 'get user by auth token',
+  })
+  @ApiHeader(requiredUserHeader)
+  @Get('/me')
+  async getMe(@Req() req: RequiredUserRequest) {
+    return {
+      data: {
+        user: userEntityToDto(req.user),
       },
     };
   }

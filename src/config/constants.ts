@@ -6,3 +6,9 @@ export const optionalUserHeader = {
   description: 'optional auth token',
   required: false,
 };
+
+export const requiredUserHeader = {
+  name: 'x-auth-token',
+  description: 'required auth token',
+  required: true,
+};
