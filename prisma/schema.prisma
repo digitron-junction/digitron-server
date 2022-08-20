@@ -110,8 +110,13 @@ model review {
 }
 
 model order {
-  id        Int @id @default(autoincrement())
-  productId Int @map("product_id")
+  id           Int     @id @default(autoincrement())
+  productId    Int     @map("product_id")
+  customerId   Int     @map("customer_id")
+  quantity     Int
+  isPaid       Boolean @map("is_paid")
+  isDeliveried Boolean @default(false) @map("is_deliveried")
+  bill         Int     @map("bill")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)

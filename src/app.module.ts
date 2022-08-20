@@ -14,6 +14,8 @@ import { CloudflareModule } from './modules/cloudflare/cloudflare.module';
 import { ImageModule } from './modules/image/image.module';
 import { ProductModule } from './modules/product/product.module';
 import { StoreModule } from './modules/store/store.module';
+import { ReviewModule } from './modules/review/review.module';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { StoreModule } from './modules/store/store.module';
     ImageModule,
     ProductModule,
     StoreModule,
+    ReviewModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [

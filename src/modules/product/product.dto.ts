@@ -69,7 +69,7 @@ export class CreateProductDto {
   descrption!: string;
 }
 
-const productDtoZodSchema = z.object({
+export const productDtoZodSchema = z.object({
   id: z.number(),
   name: z.string(),
   images: z.array(imageEntityZodSchema),
@@ -94,10 +94,6 @@ export const productEntityToDto = async (
   },
 ) => {
   const { ids: imageIds } = productImagesZodSchema.parse(product.images);
-
-  console.log(
-    await services.productService.getLikeCountByProductId(product.id),
-  );
 
   return productDtoZodSchema.parse({
     ...product,
