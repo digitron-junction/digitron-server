@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { user } from '@prisma/client';
+import { user, UserKind } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
@@ -8,10 +8,18 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 import { IImageEntity } from '~/entity/image.entity';
 import { UserKindEnum } from '~/entity/user.entity';
 import { imageEntityZodSchema } from '../image/image.dto';
+
+const dbUserKindToDto = (kind: UserKind) => {
+  return match(kind)
+    .with(UserKind.CONSUMER, () => UserKindEnum.Consumer)
+    .with(UserKind.STORE, () => UserKindEnum.Store)
+    .exhaustive();
+};
 
 export class SignUpDto {
   @ApiProperty({
@@ -106,6 +114,7 @@ const userResponseZodSchema = z.object({
   nickname: z.string(),
   email: z.string(),
   createdAt: z.date(),
+  kind: z.nativeEnum(UserKind).transform(dbUserKindToDto),
   store: z
     .object({
       id: z.number(),
@@ -143,6 +152,7 @@ const otherUserResponseZodSchema = z.object({
   id: z.number(),
   nickname: z.string(),
   createdAt: z.date(),
+  kind: z.nativeEnum(UserKind).transform(dbUserKindToDto),
   store: z
     .object({
       id: z.number(),
