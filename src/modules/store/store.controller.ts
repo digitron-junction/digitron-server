@@ -5,6 +5,7 @@ import { orderToDto } from '../order/order.dto';
 import { OrderService } from '../order/order.service';
 import { productEntityToDto } from '../product/product.dto';
 import { ProductService } from '../product/product.service';
+import { ReviewService } from '../review/review.service';
 import { GetStoreOrdersDto, GetStoreProductsDto } from './store.dto';
 
 @ApiTags('Store')
@@ -14,6 +15,7 @@ export class StoreController {
     private readonly productService: ProductService,
     private readonly cloudflareService: CloudflareService,
     private readonly orderService: OrderService,
+    private readonly reviewService: ReviewService,
   ) {}
 
   @ApiOperation({
@@ -30,6 +32,7 @@ export class StoreController {
             return await productEntityToDto(product, {
               cloudflareService: this.cloudflareService,
               productService: this.productService,
+              reviewService: this.reviewService,
             });
           }),
         ),

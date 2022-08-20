@@ -8,3 +8,21 @@ export class ReviewAlreadyExistsException extends ServiceException {
     });
   }
 }
+
+export class ReviewNotfoundException extends ServiceException {
+  constructor() {
+    super({
+      code: 'recordAlreadyExists',
+      messageKey: 'reviewNotfound',
+    });
+  }
+}
+
+export class NoPermissionToUpdateReviewException extends ServiceException {
+  constructor() {
+    super({
+      code: 'noPermission',
+      messageKey: 'noPermissionToUpdateReview',
+    });
+  }
+}

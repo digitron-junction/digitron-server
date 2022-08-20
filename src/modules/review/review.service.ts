@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { ReviewAlreadyExistsException } from '~/exception/service-exception/review.exception';
+import {
+  NoPermissionToUpdateReviewException,
+  ReviewAlreadyExistsException,
+  ReviewNotfoundException,
+} from '~/exception/service-exception/review.exception';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -13,6 +17,7 @@ export class ReviewService {
       where: {
         writerId,
         productId: dto.productId,
+        deletedAt: null,
       },
     });
 
@@ -28,33 +33,131 @@ export class ReviewService {
         },
       })) > 0;
 
-    return await this.prismaService.review.create({
-      data: {
+    return await this.prismaService.review.upsert({
+      where: {
+        productId_writerId: {
+          writerId,
+          productId: dto.productId,
+        },
+      },
+      create: {
         writerId,
         productId: dto.productId,
         rating: dto.rating,
         content: dto.content,
         isBuyer,
       },
+      update: {
+        writerId,
+        productId: dto.productId,
+        rating: dto.rating,
+        content: dto.content,
+        isBuyer,
+        deletedAt: null,
+      },
       include: {
-        product: true,
+        writer: true,
       },
     });
   }
 
-  findAll() {
-    return `This action returns all review`;
+  async findOne(id: number) {
+    const review = await this.prismaService.review.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+      include: {
+        writer: true,
+      },
+    });
+
+    if (review === null) {
+      throw new ReviewNotfoundException();
+    }
+
+    return review;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
+  async update(id: number, updateReviewDto: UpdateReviewDto, writerId: number) {
+    const preReview = await this.prismaService.review.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+    });
+
+    if (preReview === null) {
+      throw new ReviewNotfoundException();
+    }
+
+    if (preReview.writerId !== writerId) {
+      throw new NoPermissionToUpdateReviewException();
+    }
+
+    return await this.prismaService.review.update({
+      where: {
+        id,
+      },
+      data: {
+        content: updateReviewDto.content,
+        rating: updateReviewDto.rating,
+      },
+      include: {
+        writer: true,
+      },
+    });
   }
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
+  async remove(id: number, writerId: number) {
+    const preReview = await this.prismaService.review.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+    });
+
+    if (preReview === null) {
+      throw new ReviewNotfoundException();
+    }
+
+    if (preReview.writerId !== writerId) {
+      throw new NoPermissionToUpdateReviewException();
+    }
+
+    return await this.prismaService.review.update({
+      where: {
+        id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+      include: {
+        writer: true,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
+  async findReviewsWithBuyerCondition(productId: number) {
+    const reviews = await this.prismaService.review.findMany({
+      where: {
+        deletedAt: null,
+        productId,
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      include: {
+        writer: true,
+      },
+    });
+
+    const buyerReviews = reviews.filter((review) => review.isBuyer);
+    const nonBuyerReviews = reviews.filter((review) => !review.isBuyer);
+
+    return {
+      buyerReviews,
+      nonBuyerReviews,
+    };
   }
 }

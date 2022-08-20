@@ -13,6 +13,8 @@ const KeyMessage = {
   noPermissionToUpdateOrder: 'you cannot update order',
   reviewAlreadyExists: 'you already write review at this product',
   noStock: 'no stock remain',
+  reviewNotfound: "review doesn't exists",
+  noPermissionToUpdateReview: 'no permission to update review',
 };
 
 export type MessageKey = keyof typeof KeyMessage;

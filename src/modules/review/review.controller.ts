@@ -16,6 +16,7 @@ import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { RequiredUserGuard } from '~/guard/required-user.guard';
 import { requiredUserHeader } from '~/config/constants';
 import { RequiredUserRequest } from '~/types/request';
+import { reviewEntityToDto } from './dto/review.dto';
 
 @ApiTags('Review')
 @Controller('/api/v1/reviews')
@@ -36,28 +37,53 @@ export class ReviewController {
 
     return {
       data: {
-        review,
+        review: reviewEntityToDto(review),
       },
     };
   }
 
-  @Get()
-  findAll() {
-    return this.reviewService.findAll();
+  @Get(':reviewId')
+  async findOne(@Param('reviewId') reviewId: string) {
+    const review = await this.reviewService.findOne(+reviewId);
+
+    return {
+      data: {
+        review: reviewEntityToDto(review),
+      },
+    };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewService.findOne(+id);
-  }
-
+  @UseGuards(RequiredUserGuard)
+  @ApiHeader(requiredUserHeader)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewService.update(+id, updateReviewDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateReviewDto: UpdateReviewDto,
+    @Req() req: RequiredUserRequest,
+  ) {
+    const review = await this.reviewService.update(
+      +id,
+      updateReviewDto,
+      req.user.id,
+    );
+
+    return {
+      data: {
+        review: reviewEntityToDto(review),
+      },
+    };
   }
 
+  @UseGuards(RequiredUserGuard)
+  @ApiHeader(requiredUserHeader)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reviewService.remove(+id);
+  async remove(@Param('id') id: string, @Req() req: RequiredUserRequest) {
+    const review = await this.reviewService.remove(+id, req.user.id);
+
+    return {
+      data: {
+        review: reviewEntityToDto(review),
+      },
+    };
   }
 }

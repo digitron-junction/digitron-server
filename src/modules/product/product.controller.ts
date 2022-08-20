@@ -15,6 +15,7 @@ import { RequiredStoreUserGuard } from '~/guard/required-store-user.guard';
 import { RequiredUserGuard } from '~/guard/required-user.guard';
 import { RequiredStoreUserRequest } from '~/types/request';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
+import { ReviewService } from '../review/review.service';
 import {
   ChangeProductStockBodyDto,
   ChangeProductStockParamsDto,
@@ -33,6 +34,7 @@ export class ProductController {
   constructor(
     private readonly productService: ProductService,
     private readonly cloudflareService: CloudflareService,
+    private readonly reviewService: ReviewService,
   ) {}
 
   @UseGuards(RequiredStoreUserGuard)
@@ -52,6 +54,7 @@ export class ProductController {
         product: await productEntityToDto(product, {
           cloudflareService: this.cloudflareService,
           productService: this.productService,
+          reviewService: this.reviewService,
         }),
       },
     };
@@ -65,6 +68,7 @@ export class ProductController {
         product: await productEntityToDto(product, {
           cloudflareService: this.cloudflareService,
           productService: this.productService,
+          reviewService: this.reviewService,
         }),
       },
     };
@@ -87,6 +91,7 @@ export class ProductController {
         product: await productEntityToDto(product, {
           cloudflareService: this.cloudflareService,
           productService: this.productService,
+          reviewService: this.reviewService,
         }),
       },
     };
@@ -109,6 +114,7 @@ export class ProductController {
         product: await productEntityToDto(product, {
           cloudflareService: this.cloudflareService,
           productService: this.productService,
+          reviewService: this.reviewService,
         }),
       },
     };
@@ -131,6 +137,7 @@ export class ProductController {
         product: await productEntityToDto(product, {
           cloudflareService: this.cloudflareService,
           productService: this.productService,
+          reviewService: this.reviewService,
         }),
       },
     };
@@ -153,6 +160,7 @@ export class ProductController {
         product: await productEntityToDto(product, {
           cloudflareService: this.cloudflareService,
           productService: this.productService,
+          reviewService: this.reviewService,
         }),
       },
     };

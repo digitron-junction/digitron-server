@@ -2,9 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { product, store } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsNumber, IsString } from 'class-validator';
+import * as _ from 'lodash';
 import { z } from 'zod';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
 import { imageEntityZodSchema } from '../image/image.dto';
+import { reviewZodSchema } from '../review/dto/review.dto';
+import { ReviewService } from '../review/review.service';
 import { storeToDto, storeZodSchema } from '../user/user.dto';
 import { ProductService } from './product.service';
 
@@ -90,6 +93,9 @@ export const productDtoZodSchema = z.object({
   store: storeZodSchema,
   stock: z.number(),
   likeCount: z.number(),
+  rating: z.number(),
+  nonBuyerReview: z.array(reviewZodSchema),
+  buyReview: z.array(reviewZodSchema),
 });
 
 const productImagesZodSchema = z.object({
@@ -101,9 +107,21 @@ export const productEntityToDto = async (
   services: {
     cloudflareService: CloudflareService;
     productService: ProductService;
+    reviewService: ReviewService;
   },
 ) => {
   const { ids: imageIds } = productImagesZodSchema.parse(product.images);
+
+  const reviews = await services.reviewService.findReviewsWithBuyerCondition(
+    product.id,
+  );
+
+  const allReviews = [...reviews.buyerReviews, ...reviews.nonBuyerReviews];
+
+  const rating =
+    allReviews.length > 0
+      ? _.mean(allReviews.map((review) => review.rating))
+      : 0;
 
   return productDtoZodSchema.parse({
     ...product,
@@ -119,6 +137,9 @@ export const productEntityToDto = async (
     likeCount: await services.productService.getLikeCountByProductId(
       product.id,
     ),
+    nonBuyerReview: reviews.nonBuyerReviews,
+    buyReview: reviews.buyerReviews,
+    rating,
   });
 };
 
