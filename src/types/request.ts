@@ -8,3 +8,7 @@ export interface OptionalUserRequest extends Request {
 export interface RequiredUserRequest extends Request {
   user: user & { store: store | null };
 }
+
+export interface RequiredStoreUserRequest extends Request {
+  user: user & { store: store };
+}

@@ -44,3 +44,12 @@ export class UserNotfoundException extends ServiceException {
     });
   }
 }
+
+export class OnlyStoreAccountAccessException extends ServiceException {
+  constructor() {
+    super({
+      code: 'badRequest',
+      messageKey: 'onlyStoreAccountAccess',
+    });
+  }
+}

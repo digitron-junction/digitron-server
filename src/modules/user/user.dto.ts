@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { user, UserKind } from '@prisma/client';
+import { store, user, UserKind } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
@@ -12,6 +12,7 @@ import { match } from 'ts-pattern';
 import { z } from 'zod';
 import { IImageEntity } from '~/entity/image.entity';
 import { UserKindEnum } from '~/entity/user.entity';
+import { CloudflareService } from '../cloudflare/cloudflare.service';
 import { imageEntityZodSchema } from '../image/image.dto';
 
 const dbUserKindToDto = (kind: UserKind) => {
@@ -109,22 +110,22 @@ export class SigninDto {
   password!: string;
 }
 
+export const storeZodSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  descrption: z.string(),
+  address: z.string(),
+  storeCategory: z.string(),
+  image: imageEntityZodSchema.optional().nullable().default(null),
+});
+
 const userResponseZodSchema = z.object({
   id: z.number(),
   nickname: z.string(),
   email: z.string(),
   createdAt: z.date(),
   kind: z.nativeEnum(UserKind).transform(dbUserKindToDto),
-  store: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-      descrption: z.string(),
-      address: z.string(),
-      storeCategory: z.string(),
-      image: imageEntityZodSchema.optional().nullable().default(null),
-    })
-    .nullable(),
+  store: storeZodSchema.nullable(),
 });
 
 export const userEntityToDto = (
@@ -153,16 +154,7 @@ const otherUserResponseZodSchema = z.object({
   nickname: z.string(),
   createdAt: z.date(),
   kind: z.nativeEnum(UserKind).transform(dbUserKindToDto),
-  store: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-      descrption: z.string(),
-      address: z.string(),
-      storeCategory: z.string(),
-      image: imageEntityZodSchema.optional().nullable().default(null),
-    })
-    .nullable(),
+  store: storeZodSchema.nullable(),
 });
 
 export const otherUserEntityToDto = (
@@ -188,3 +180,14 @@ export class GetOneUserDto {
   @IsNumber()
   userId!: number;
 }
+
+export const storeToDto = async (
+  store: store,
+  services: { cloudflareService: CloudflareService },
+) => {
+  const image = store.imageId
+    ? await services.cloudflareService.getImageDetailById(store.imageId)
+    : null;
+
+  return storeZodSchema.parse({ ...store, image });
+};

@@ -12,6 +12,8 @@ import { RavenInterceptor } from 'nest-raven';
 import { RavenOption } from './config/raven.config';
 import { CloudflareModule } from './modules/cloudflare/cloudflare.module';
 import { ImageModule } from './modules/image/image.module';
+import { ProductModule } from './modules/product/product.module';
+import { StoreModule } from './modules/store/store.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { ImageModule } from './modules/image/image.module';
     WinstonModule.forRoot(winstonConfig),
     CloudflareModule,
     ImageModule,
+    ProductModule,
+    StoreModule,
   ],
   controllers: [AppController],
   providers: [

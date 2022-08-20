@@ -59,16 +59,16 @@ model store {
 // }
 
 model product {
-  id            Int    @id @default(autoincrement())
-  orderId       Int    @map("order_id")
+  id Int @id @default(autoincrement())
+
   name          String @db.VarChar(255)
   images        Json
   category      String @db.VarChar(100)
-  subCategory   String @db.VarChar(100)
+  subCategory   String @map("sub_category") @db.VarChar(100)
   price         Int
-  originalPrice Int
+  originalPrice Int    @map("original_price")
   descrption    String @db.VarChar(255)
-  storeId       Int
+  storeId       Int    @map("store_id")
 
   store store @relation(fields: [storeId], references: [id])
 
@@ -83,19 +83,20 @@ model product {
 }
 
 model productLike {
-  userId    Int
-  productId Int
+  userId    Int     @map("user_id")
+  productId Int     @map("product_id")
   product   product @relation(fields: [productId], references: [id])
   user      user    @relation(fields: [userId], references: [id])
 
   @@unique([productId, userId])
+  @@map("product_likes")
 }
 
 model review {
   id        Int    @id @default(autoincrement())
   content   String @db.Text
-  userId    Int
-  productId Int
+  userId    Int    @map("user_id")
+  productId Int    @map("product_id")
   rating    Int
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -111,8 +112,8 @@ model review {
 model comment {
   id        Int    @id @default(autoincrement())
   content   String @db.Text
-  userId    Int
-  productId Int
+  userId    Int    @map("user_id")
+  productId Int    @map("product_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)

@@ -16,6 +16,7 @@ import { InvalidSignUpArgumentException } from '~/exception/service-exception/us
 import { OptionalUserGuard } from '~/guard/optional-user.guard';
 import { RequiredUserGuard } from '~/guard/required-user.guard';
 import { OptionalUserRequest, RequiredUserRequest } from '~/types/request';
+import { ProductService } from '../product/product.service';
 import {
   authTokenToDto,
   GetOneUserDto,
@@ -49,7 +50,10 @@ export const signupUserZodSchema = z.union([
 @ApiTags('User API')
 @Controller('/api/v1/users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly productService: ProductService,
+  ) {}
 
   @ApiOperation({
     summary: 'sign up',

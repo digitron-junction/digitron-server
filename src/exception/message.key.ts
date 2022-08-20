@@ -6,6 +6,8 @@ const KeyMessage = {
     'Either the user does not exist or the password is not valid.',
   userNotfound: 'user was not found',
   invalidImage: 'invalid image',
+  onlyStoreAccountAccess: 'only store account can access',
+  productNotExists: 'product not exists',
 };
 
 export type MessageKey = keyof typeof KeyMessage;
