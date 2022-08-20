@@ -88,6 +88,7 @@ export const productDtoZodSchema = z.object({
   originalPrice: z.number(),
   descrption: z.string(),
   store: storeZodSchema,
+  stock: z.number(),
   likeCount: z.number(),
 });
 
