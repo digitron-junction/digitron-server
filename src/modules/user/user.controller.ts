@@ -66,7 +66,9 @@ export class UserController {
 
     return {
       data: {
-        user: userEntityToDto(user),
+        user: userEntityToDto(user, {
+          storeImage: (await this.userService.getUserImage(user)) ?? undefined,
+        }),
         authToken: authTokenToDto(user),
       },
     };
@@ -77,7 +79,9 @@ export class UserController {
     const user = await this.userService.signin(dto);
     return {
       data: {
-        user: userEntityToDto(user),
+        user: userEntityToDto(user, {
+          storeImage: (await this.userService.getUserImage(user)) ?? undefined,
+        }),
         authToken: authTokenToDto(user),
       },
     };
@@ -92,7 +96,10 @@ export class UserController {
   async getMe(@Req() req: RequiredUserRequest) {
     return {
       data: {
-        user: userEntityToDto(req.user),
+        user: userEntityToDto(req.user, {
+          storeImage:
+            (await this.userService.getUserImage(req.user)) ?? undefined,
+        }),
       },
     };
   }
@@ -113,8 +120,14 @@ export class UserController {
       data: {
         user:
           req.user?.id === user.id
-            ? userEntityToDto(user)
-            : otherUserEntityToDto(user),
+            ? userEntityToDto(user, {
+                storeImage:
+                  (await this.userService.getUserImage(user)) ?? undefined,
+              })
+            : otherUserEntityToDto(user, {
+                storeImage:
+                  (await this.userService.getUserImage(user)) ?? undefined,
+              }),
       },
     };
   }

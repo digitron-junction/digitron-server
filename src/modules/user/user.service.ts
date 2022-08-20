@@ -14,10 +14,16 @@ import { hash, compare } from 'bcrypt';
 import { getConfig } from '~/config/config';
 import * as sha from 'sha.js';
 import { match } from 'ts-pattern';
+import { CloudflareService } from '../cloudflare/cloudflare.service';
+import { ImageInvalidException } from '~/exception/service-exception/image.exception';
+import { store, user } from '@prisma/client';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cloudflareService: CloudflareService,
+  ) {}
 
   private async createAuthToken(userId: number) {
     const authToken = sha('sha256')
@@ -75,6 +81,15 @@ export class UserService {
         });
       })
       .with({ kind: UserKindEnum.Store }, async (_args) => {
+        if (
+          _args.storeImageId &&
+          !(await this.cloudflareService.validateImageUpload(
+            _args.storeImageId,
+          ))
+        ) {
+          throw new ImageInvalidException();
+        }
+
         return await this.prismaService.user.create({
           data: {
             email: args.email,
@@ -150,5 +165,19 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async getUserImage(
+    user: user & {
+      store: store | null;
+    },
+  ) {
+    if (user.store?.imageId) {
+      return await this.cloudflareService.getImageDetailById(
+        user.store.imageId,
+      );
+    }
+
+    return null;
   }
 }

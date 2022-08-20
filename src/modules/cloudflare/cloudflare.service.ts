@@ -54,21 +54,25 @@ export class CloudflareService {
   }
 
   async validateImageUpload(imageId: string): Promise<boolean> {
-    const response = await this.pool.request({
-      method: 'GET',
-      path: `/client/v4/accounts/${
-        getConfig().CLOUDFLARE_ACCOUNT
-      }/images/v1/${imageId}`,
-      headers: {
-        'content-type': 'application/json',
-        authorization: `Bearer ${getConfig().CLOUDFLARE_TOKEN}`,
-      },
-    });
+    try {
+      const response = await this.pool.request({
+        method: 'GET',
+        path: `/client/v4/accounts/${
+          getConfig().CLOUDFLARE_ACCOUNT
+        }/images/v1/${imageId}`,
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${getConfig().CLOUDFLARE_TOKEN}`,
+        },
+      });
 
-    return (
-      imageDraftCheckResponseZodSchema.parse(await response.body.json()).result
-        .draft !== true
-    );
+      return (
+        imageDraftCheckResponseZodSchema.parse(await response.body.json())
+          .result.draft !== true
+      );
+    } catch (error) {
+      return false;
+    }
   }
 
   async getImageDetailById(imageId: string): Promise<IImageEntity> {

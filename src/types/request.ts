@@ -1,4 +1,4 @@
-import { user } from '@prisma/client';
+import { store, user } from '@prisma/client';
 import { Request } from 'express';
 
 export interface OptionalUserRequest extends Request {
@@ -6,5 +6,5 @@ export interface OptionalUserRequest extends Request {
 }
 
 export interface RequiredUserRequest extends Request {
-  user: user;
+  user: user & { store: store | null };
 }
