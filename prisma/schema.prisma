@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id       Int      @id @default(autoincrement())
+  nickname String?  @unique @db.VarChar(255)
+  email    String   @unique @db.VarChar(255)
+  kind     UserKind
+
+  password  String  @db.VarChar(255)
+  authToken String? @unique @map("auth_token") @db.VarChar(255)
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  store store?
+  // consumer consumer?
+
+  @@index([authToken])
+}
+
+enum UserKind {
+  STORE
+  CONSUMER
+}
+
+model store {
+  id            Int     @id @default(autoincrement())
+  name          String  @db.VarChar(255)
+  imageUrl      String? @map("image_url") @db.VarChar(255)
+  descrption    String  @db.Text()
+  address       String  @db.VarChar(255)
+  storeCategory String  @map("store_category") @db.VarChar(255)
+
+  userId Int  @unique @map("user_id")
+  user   user @relation(fields: [userId], references: [id])
+}
+
+// model consumer {
+//   id Int @id @default(autoincrement())
+
+//   userId Int  @unique @map("user_id")
+//   user   user @relation(fields: [userId], references: [id])
+// }
+
+model product {
+  id      Int @id @default(autoincrement())
+  orderId Int @map("order_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  order order[]
+}
+
+model order {
+  id        Int @id @default(autoincrement())
+  productId Int @map("product_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  product product @relation(fields: [productId], references: [id])
+}
