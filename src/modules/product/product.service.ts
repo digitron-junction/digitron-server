@@ -110,4 +110,65 @@ export class ProductService {
 
     return product;
   }
+
+  async getLikeCountByProductId(productId: number) {
+    return await this.prismaService.productLike.count({
+      where: {
+        productId,
+      },
+    });
+  }
+
+  async decrProductLike({
+    userId,
+    productId,
+  }: {
+    userId: number;
+    productId: number;
+  }) {
+    const like = await this.prismaService.productLike.findFirst({
+      where: {
+        productId,
+        userId,
+      },
+    });
+
+    if (like === null) {
+      const product = await this.getProductById(productId);
+
+      return product;
+    }
+
+    await this.prismaService.productLike.delete({
+      where: {
+        productId_userId: {
+          productId,
+          userId,
+        },
+      },
+    });
+
+    const product = await this.getProductById(productId);
+
+    return product;
+  }
+
+  async incrProductLike({
+    userId,
+    productId,
+  }: {
+    userId: number;
+    productId: number;
+  }) {
+    await this.prismaService.productLike.upsert({
+      where: { productId_userId: { userId, productId } },
+      create: {
+        productId,
+        userId,
+      },
+      update: {},
+    });
+
+    return await this.getProductById(productId);
+  }
 }

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
 import { imageEntityZodSchema } from '../image/image.dto';
 import { storeToDto, storeZodSchema } from '../user/user.dto';
+import { ProductService } from './product.service';
 
 export class CreateProductDto {
   @ApiProperty({
@@ -78,6 +79,7 @@ const productDtoZodSchema = z.object({
   originalPrice: z.number(),
   descrption: z.string(),
   store: storeZodSchema,
+  likeCount: z.number(),
 });
 
 const productImagesZodSchema = z.object({
@@ -86,9 +88,16 @@ const productImagesZodSchema = z.object({
 
 export const productEntityToDto = async (
   product: product & { store: store },
-  services: { cloudflareService: CloudflareService },
+  services: {
+    cloudflareService: CloudflareService;
+    productService: ProductService;
+  },
 ) => {
   const { ids: imageIds } = productImagesZodSchema.parse(product.images);
+
+  console.log(
+    await services.productService.getLikeCountByProductId(product.id),
+  );
 
   return productDtoZodSchema.parse({
     ...product,
@@ -101,6 +110,9 @@ export const productEntityToDto = async (
       }),
     ),
     store: await storeToDto(product.store, services),
+    likeCount: await services.productService.getLikeCountByProductId(
+      product.id,
+    ),
   });
 };
 
@@ -115,6 +127,26 @@ export class GetProductDto {
 }
 
 export class DeleteProductDto {
+  @ApiProperty({
+    description: 'product id',
+    required: true,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  productId!: number;
+}
+
+export class IncrLikeDto {
+  @ApiProperty({
+    description: 'product id',
+    required: true,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  productId!: number;
+}
+
+export class DecrLikeDto {
   @ApiProperty({
     description: 'product id',
     required: true,

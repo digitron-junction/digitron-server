@@ -5,18 +5,22 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { requiredUserHeader } from '~/config/constants';
 import { RequiredStoreUserGuard } from '~/guard/required-store-user.guard';
+import { RequiredUserGuard } from '~/guard/required-user.guard';
 import { RequiredStoreUserRequest } from '~/types/request';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
 import {
   CreateProductDto,
+  DecrLikeDto,
   DeleteProductDto,
   GetProductDto,
+  IncrLikeDto,
   productEntityToDto,
 } from './product.dto';
 import { ProductService } from './product.service';
@@ -45,6 +49,7 @@ export class ProductController {
       data: {
         product: await productEntityToDto(product, {
           cloudflareService: this.cloudflareService,
+          productService: this.productService,
         }),
       },
     };
@@ -57,6 +62,7 @@ export class ProductController {
       data: {
         product: await productEntityToDto(product, {
           cloudflareService: this.cloudflareService,
+          productService: this.productService,
         }),
       },
     };
@@ -78,6 +84,51 @@ export class ProductController {
       data: {
         product: await productEntityToDto(product, {
           cloudflareService: this.cloudflareService,
+          productService: this.productService,
+        }),
+      },
+    };
+  }
+
+  @UseGuards(RequiredUserGuard)
+  @ApiHeader(requiredUserHeader)
+  @Put('/:productId/likes/incr')
+  async incrLike(
+    @Param() { productId }: IncrLikeDto,
+    @Req() req: RequiredStoreUserRequest,
+  ) {
+    const product = await this.productService.incrProductLike({
+      userId: req.user.id,
+      productId,
+    });
+
+    return {
+      data: {
+        product: await productEntityToDto(product, {
+          cloudflareService: this.cloudflareService,
+          productService: this.productService,
+        }),
+      },
+    };
+  }
+
+  @UseGuards(RequiredUserGuard)
+  @ApiHeader(requiredUserHeader)
+  @Put('/:productId/likes/decr')
+  async decrLike(
+    @Param() { productId }: DecrLikeDto,
+    @Req() req: RequiredStoreUserRequest,
+  ) {
+    const product = await this.productService.decrProductLike({
+      userId: req.user.id,
+      productId,
+    });
+
+    return {
+      data: {
+        product: await productEntityToDto(product, {
+          cloudflareService: this.cloudflareService,
+          productService: this.productService,
         }),
       },
     };

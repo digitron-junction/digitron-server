@@ -26,6 +26,7 @@ export class StoreController {
           products.map(async (product) => {
             return await productEntityToDto(product, {
               cloudflareService: this.cloudflareService,
+              productService: this.productService,
             });
           }),
         ),
