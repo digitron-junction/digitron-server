@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { order, product } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsNumber } from 'class-validator';
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 import { z } from 'zod';
 
 export class CreateOrderDto {
@@ -20,6 +20,34 @@ export class CreateOrderDto {
   @Type(() => Number)
   @IsNumber()
   quantity!: number;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  ipfsImageHash!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  recevierAddress!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  senderAddress!: string;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  blockAddress!: string;
 }
 
 const orderZodSchema = z.object({

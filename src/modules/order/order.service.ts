@@ -32,6 +32,10 @@ export class OrderService {
         isPaid: false,
         isDeliveried: false,
         bill: product.price * dto.quantity,
+        ipfsImageHash: dto.ipfsImageHash,
+        recevierAddress: dto.recevierAddress,
+        senderAddress: dto.senderAddress,
+        blockAddress: dto.blockAddress,
       },
       include: {
         product: true,
