@@ -1,10 +1,24 @@
-import { Body, Controller, Post, Put } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
+import { optionalUserHeader } from '~/config/constants';
 import { UserKindEnum } from '~/entity/user.entity';
 import { InvalidSignUpArgumentException } from '~/exception/service-exception/user.exception';
+import { OptionalUserGuard } from '~/guard/optional-user.guard';
+import { OptionalUserRequest } from '~/types/request';
 import {
   authTokenToDto,
+  GetOneUserDto,
+  otherUserEntityToDto,
   SigninDto,
   SignUpDto,
   userEntityToDto,
@@ -64,6 +78,28 @@ export class UserController {
       data: {
         user: userEntityToDto(user),
         authToken: authTokenToDto(user),
+      },
+    };
+  }
+
+  @UseGuards(OptionalUserGuard)
+  @ApiOperation({
+    summary: 'get one user',
+  })
+  @ApiHeader(optionalUserHeader)
+  @Get('/:userId')
+  async getOneUser(
+    @Param() { userId }: GetOneUserDto,
+    @Req() req: OptionalUserRequest,
+  ) {
+    const user = await this.userService.getUserById(userId);
+
+    return {
+      data: {
+        user:
+          req.user?.id === user.id
+            ? userEntityToDto(user)
+            : otherUserEntityToDto(user),
       },
     };
   }

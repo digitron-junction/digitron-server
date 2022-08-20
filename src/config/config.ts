@@ -4,6 +4,7 @@ import { ze } from '~/internal-package/zod-extension';
 const configZodSchema = z.object({
   DATABASE_URL: z.string(),
   PASSWORD_HASH_SALT_ROUND: ze.intString().transform(Number),
+  SENTRY_DSN: z.string().optional(),
 });
 
 let config: z.infer<typeof configZodSchema> | null = null;

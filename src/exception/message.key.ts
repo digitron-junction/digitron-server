@@ -4,6 +4,7 @@ const KeyMessage = {
   nicknameAlreadyExists: 'user already exists on that nickname',
   userNotfoundOrPasswordWrong:
     'Either the user does not exist or the password is not valid.',
+  userNotfound: 'user was not found',
 };
 
 export type MessageKey = keyof typeof KeyMessage;

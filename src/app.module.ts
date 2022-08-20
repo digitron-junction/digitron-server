@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -8,6 +8,8 @@ import { HealthCheckModule } from './modules/health-check/health-check.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { UserModule } from './modules/user/user.module';
 import { winstonConfig } from './config/winston.config';
+import { RavenInterceptor } from 'nest-raven';
+import { RavenOption } from './config/raven.config';
 
 @Module({
   imports: [
@@ -22,6 +24,10 @@ import { winstonConfig } from './config/winston.config';
     {
       provide: APP_FILTER,
       useClass: ServiceExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useValue: new RavenInterceptor(RavenOption),
     },
   ],
 })

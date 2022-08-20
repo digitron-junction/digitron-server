@@ -35,3 +35,12 @@ export class UserNotfoundOrPasswordWrongException extends ServiceException {
     });
   }
 }
+
+export class UserNotfoundException extends ServiceException {
+  constructor() {
+    super({
+      code: 'noPermission',
+      messageKey: 'userNotfound',
+    });
+  }
+}

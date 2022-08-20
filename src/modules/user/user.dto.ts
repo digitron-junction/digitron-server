@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { user } from '@prisma/client';
-import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsEmail,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { z } from 'zod';
 import { UserKindEnum } from '~/entity/user.entity';
 
@@ -120,3 +127,34 @@ const authTokenReponseZodSchema = z.object({
 export const authTokenToDto = (user: user) => {
   return authTokenReponseZodSchema.parse(user);
 };
+
+const otherUserResponseZodSchema = z.object({
+  id: z.number(),
+  nickname: z.string(),
+  createdAt: z.date(),
+  store: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+      imageUrl: z.string().nullable(),
+      descrption: z.string(),
+      address: z.string(),
+      storeCategory: z.string(),
+    })
+    .nullable(),
+});
+
+export const otherUserEntityToDto = (user: user) => {
+  return otherUserResponseZodSchema.parse(user);
+};
+
+export class GetOneUserDto {
+  @ApiProperty({
+    description: 'user Id',
+    required: true,
+    type: Number,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  userId!: number;
+}

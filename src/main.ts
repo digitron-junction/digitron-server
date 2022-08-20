@@ -7,9 +7,11 @@ import { loadConfig } from './config/config';
 import { LOGGER_FORMAT } from './config/constants';
 import * as morgan from 'morgan';
 import * as cookieParser from 'cookie-parser';
+import { initSentry } from './sentry';
 
 async function bootstrap() {
   await loadConfig();
+  await initSentry();
 
   const app = await NestFactory.create(AppModule);
 

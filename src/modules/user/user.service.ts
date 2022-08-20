@@ -4,6 +4,7 @@ import { UserKindEnum } from '~/entity/user.entity';
 import {
   UserEmailAlreadyExistsException,
   UserNicknameAlreadyExistsException,
+  UserNotfoundException,
   UserNotfoundOrPasswordWrongException,
 } from '~/exception/service-exception/user.exception';
 
@@ -119,5 +120,35 @@ export class UserService {
     }
 
     return await this.createAuthToken(user.id);
+  }
+
+  async getUserById(userId: number) {
+    const user = await this.prismaService.user.findFirst({
+      where: { id: userId },
+      include: {
+        store: true,
+      },
+    });
+
+    if (!user) {
+      throw new UserNotfoundException();
+    }
+
+    return user;
+  }
+
+  async getUserByAuthToken(authToken: string) {
+    const user = await this.prismaService.user.findFirst({
+      where: { authToken },
+      include: {
+        store: true,
+      },
+    });
+
+    if (!user) {
+      throw new UserNotfoundException();
+    }
+
+    return user;
   }
 }
