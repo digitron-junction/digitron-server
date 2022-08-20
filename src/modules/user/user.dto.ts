@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { user } from '@prisma/client';
 import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { z } from 'zod';
 import { UserKindEnum } from '~/entity/user.entity';
 
 export class SignUpDto {
@@ -89,3 +91,32 @@ export class SigninDto {
   @IsString()
   password!: string;
 }
+
+const userResponseZodSchema = z.object({
+  id: z.number(),
+  nickname: z.string(),
+  email: z.string(),
+  createdAt: z.date(),
+  store: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+      imageUrl: z.string().nullable(),
+      descrption: z.string(),
+      address: z.string(),
+      storeCategory: z.string(),
+    })
+    .nullable(),
+});
+
+export const userEntityToDto = (user: user) => {
+  return userResponseZodSchema.parse(user);
+};
+
+const authTokenReponseZodSchema = z.object({
+  authToken: z.string(),
+});
+
+export const authTokenToDto = (user: user) => {
+  return authTokenReponseZodSchema.parse(user);
+};

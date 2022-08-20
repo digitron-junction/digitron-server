@@ -3,7 +3,12 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { UserKindEnum } from '~/entity/user.entity';
 import { InvalidSignUpArgumentException } from '~/exception/service-exception/user.exception';
-import { SigninDto, SignUpDto } from './user.dto';
+import {
+  authTokenToDto,
+  SigninDto,
+  SignUpDto,
+  userEntityToDto,
+} from './user.dto';
 import { UserService } from './user.service';
 
 export const signupUserZodSchema = z.union([
@@ -46,7 +51,8 @@ export class UserController {
 
     return {
       data: {
-        user,
+        user: userEntityToDto(user),
+        authToken: authTokenToDto(user),
       },
     };
   }
@@ -56,7 +62,8 @@ export class UserController {
     const user = await this.userService.signin(dto);
     return {
       data: {
-        user,
+        user: userEntityToDto(user),
+        authToken: authTokenToDto(user),
       },
     };
   }
