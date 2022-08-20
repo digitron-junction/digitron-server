@@ -36,8 +36,6 @@ export class CloudflareService {
   }
 
   async getImageUploadUrl(): Promise<string> {
-    console.log('aa');
-
     const response = await this.pool.request({
       method: 'POST',
       path: `/client/v4/accounts/${

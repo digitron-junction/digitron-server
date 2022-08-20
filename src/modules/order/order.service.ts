@@ -121,8 +121,6 @@ export class OrderService {
       by: ['customerId'],
     });
 
-    console.log(resultGroupBy);
-
     return resultGroupBy.length;
   }
 }
