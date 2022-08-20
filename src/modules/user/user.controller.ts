@@ -1,9 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { UserKindEnum } from '~/entity/user.entity';
 import { InvalidSignUpArgumentException } from '~/exception/service-exception/user.exception';
-import { SignUpDto } from './user.dto';
+import { SigninDto, SignUpDto } from './user.dto';
 import { UserService } from './user.service';
 
 export const signupUserZodSchema = z.union([
@@ -44,6 +44,16 @@ export class UserController {
 
     const user = await this.userService.signup(parsedDto);
 
+    return {
+      data: {
+        user,
+      },
+    };
+  }
+
+  @Put('/signin')
+  async signin(@Body() dto: SigninDto) {
+    const user = await this.userService.signin(dto);
     return {
       data: {
         user,

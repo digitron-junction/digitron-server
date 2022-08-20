@@ -4,11 +4,12 @@ import { UserKindEnum } from '~/entity/user.entity';
 import {
   UserEmailAlreadyExistsException,
   UserNicknameAlreadyExistsException,
+  UserNotfoundOrPasswordWrongException,
 } from '~/exception/service-exception/user.exception';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { signupUserZodSchema } from './user.controller';
-import { hash } from 'bcrypt';
+import { hash, compare } from 'bcrypt';
 import { getConfig } from '~/config/config';
 import * as sha from 'sha.js';
 import { match } from 'ts-pattern';
@@ -98,6 +99,24 @@ export class UserService {
         });
       })
       .exhaustive();
+
+    return await this.createAuthToken(user.id);
+  }
+
+  async signin({ email, password }: { email: string; password: string }) {
+    const user = await this.prismaService.user.findFirst({
+      where: { email },
+    });
+
+    if (user === null) {
+      throw new UserNotfoundOrPasswordWrongException();
+    }
+
+    const isValid = await compare(password, user.password);
+
+    if (isValid === false) {
+      throw new UserNotfoundOrPasswordWrongException();
+    }
 
     return await this.createAuthToken(user.id);
   }

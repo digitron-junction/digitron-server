@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 import { UserKindEnum } from '~/entity/user.entity';
 
 export class SignUpDto {
@@ -14,7 +14,7 @@ export class SignUpDto {
   @ApiProperty({
     required: true,
   })
-  @IsString()
+  @IsEmail()
   email!: string;
 
   @ApiProperty({
@@ -72,4 +72,20 @@ export class SignUpDto {
   @IsOptional()
   @IsString()
   storeCategory!: string;
+}
+
+export class SigninDto {
+  @ApiProperty({
+    description: "user's email",
+    required: true,
+  })
+  @IsEmail()
+  email!: string;
+
+  @ApiProperty({
+    description: "user's password",
+    required: true,
+  })
+  @IsString()
+  password!: string;
 }

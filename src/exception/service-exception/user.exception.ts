@@ -26,3 +26,12 @@ export class UserNicknameAlreadyExistsException extends ServiceException {
     });
   }
 }
+
+export class UserNotfoundOrPasswordWrongException extends ServiceException {
+  constructor() {
+    super({
+      code: 'noPermission',
+      messageKey: 'userNotfoundOrPasswordWrong',
+    });
+  }
+}
