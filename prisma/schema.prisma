@@ -24,6 +24,7 @@ model user {
   // consumer consumer?
   productLikes productLike[]
   review       review[]
+  follow       follow[]
 
   @@index([authToken])
 }
@@ -48,6 +49,7 @@ model store {
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+  follow    follow[]
 }
 
 // model consumer {
@@ -128,4 +130,15 @@ model order {
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
 
   product product @relation(fields: [productId], references: [id])
+}
+
+model follow {
+  id               Int @id @default(autoincrement())
+  followerId       Int @map("follower_id")
+  followingStoreId Int @map("following_store_id")
+
+  follower       user  @relation(fields: [followerId], references: [id])
+  followingStore store @relation(fields: [followingStoreId], references: [id])
+
+  @@unique([followingStoreId, followerId])
 }

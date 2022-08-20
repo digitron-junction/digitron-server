@@ -110,4 +110,19 @@ export class OrderService {
 
     return orders;
   }
+
+  async getUniqConsumerCountByStoreId(storeId: number) {
+    const resultGroupBy = await this.prismaService.order.groupBy({
+      where: {
+        product: {
+          storeId,
+        },
+      },
+      by: ['customerId'],
+    });
+
+    console.log(resultGroupBy);
+
+    return resultGroupBy.length;
+  }
 }

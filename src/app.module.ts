@@ -16,6 +16,7 @@ import { ProductModule } from './modules/product/product.module';
 import { StoreModule } from './modules/store/store.module';
 import { ReviewModule } from './modules/review/review.module';
 import { OrderModule } from './modules/order/order.module';
+import { FollowModule } from './modules/follow/follow.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { OrderModule } from './modules/order/order.module';
     StoreModule,
     ReviewModule,
     OrderModule,
+    FollowModule,
   ],
   controllers: [AppController],
   providers: [

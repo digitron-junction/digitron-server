@@ -1,12 +1,17 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
+import { FollowService } from '../follow/follow.service';
 import { orderToDto } from '../order/order.dto';
 import { OrderService } from '../order/order.service';
 import { productEntityToDto } from '../product/product.dto';
 import { ProductService } from '../product/product.service';
 import { ReviewService } from '../review/review.service';
-import { GetStoreOrdersDto, GetStoreProductsDto } from './store.dto';
+import {
+  GetFollowerAndConsumerCountDto,
+  GetStoreOrdersDto,
+  GetStoreProductsDto,
+} from './store.dto';
 
 @ApiTags('Store')
 @Controller('/api/v1/stores')
@@ -16,6 +21,7 @@ export class StoreController {
     private readonly cloudflareService: CloudflareService,
     private readonly orderService: OrderService,
     private readonly reviewService: ReviewService,
+    private readonly followService: FollowService,
   ) {}
 
   @ApiOperation({
@@ -54,6 +60,25 @@ export class StoreController {
             return orderToDto(order);
           }),
         ),
+      },
+    };
+  }
+
+  @ApiOperation({
+    summary: 'get count of follower and consumer',
+  })
+  @Get('/:storeId/follower_and_consumer_count')
+  async getFollowerAndConsumerCount(
+    @Param() { storeId }: GetFollowerAndConsumerCountDto,
+  ) {
+    const [consumerCount, followerCount] = await Promise.all([
+      this.orderService.getUniqConsumerCountByStoreId(storeId),
+      this.followService.getFollowerCountByStoreId(storeId),
+    ]);
+    return {
+      data: {
+        consumerCount,
+        followerCount,
       },
     };
   }

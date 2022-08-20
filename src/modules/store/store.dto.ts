@@ -23,3 +23,14 @@ export class GetStoreOrdersDto {
   @IsNumber()
   storeId!: number;
 }
+
+export class GetFollowerAndConsumerCountDto {
+  @ApiProperty({
+    description: 'store Id',
+    required: true,
+    type: Number,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  storeId!: number;
+}

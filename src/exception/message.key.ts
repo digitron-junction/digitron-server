@@ -15,6 +15,7 @@ const KeyMessage = {
   noStock: 'no stock remain',
   reviewNotfound: "review doesn't exists",
   noPermissionToUpdateReview: 'no permission to update review',
+  noFollow: "you didn't follow before",
 };
 
 export type MessageKey = keyof typeof KeyMessage;
