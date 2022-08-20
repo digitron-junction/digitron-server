@@ -3,10 +3,24 @@ import { Pool } from 'undici';
 import { z } from 'zod';
 import { getConfig } from '~/config/config';
 import { IImageEntity } from '~/entity/image.entity';
+import { ImageInvalidException } from '~/exception/service-exception/image.exception';
 
-const imgaeUploadUrlResponseZodSchema = z.object({
+const imageUploadUrlResponseZodSchema = z.object({
   result: z.object({
     uploadURL: z.string(),
+  }),
+});
+
+const imageDraftCheckResponseZodSchema = z.object({
+  result: z.object({
+    draft: z.boolean().optional(),
+  }),
+});
+
+const imageDetailResponseZodSchema = z.object({
+  result: z.object({
+    id: z.string(),
+    variants: z.array(z.string()).min(1),
   }),
 });
 
@@ -22,6 +36,8 @@ export class CloudflareService {
   }
 
   async getImageUploadUrl(): Promise<string> {
+    console.log('aa');
+
     const response = await this.pool.request({
       method: 'POST',
       path: `/client/v4/accounts/${
@@ -33,19 +49,51 @@ export class CloudflareService {
       },
     });
 
-    return imgaeUploadUrlResponseZodSchema.parse(await response.body.json())
+    return imageUploadUrlResponseZodSchema.parse(await response.body.json())
       .result.uploadURL;
   }
 
-  async validateImageUpload(): Promise<boolean> {
-    return true;
+  async validateImageUpload(imageId: string): Promise<boolean> {
+    const response = await this.pool.request({
+      method: 'GET',
+      path: `/client/v4/accounts/${
+        getConfig().CLOUDFLARE_ACCOUNT
+      }/images/v1/${imageId}`,
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${getConfig().CLOUDFLARE_TOKEN}`,
+      },
+    });
+
+    return (
+      imageDraftCheckResponseZodSchema.parse(await response.body.json()).result
+        .draft !== true
+    );
   }
 
-  async getImageDetail(): Promise<IImageEntity> {
-    return {
-      id: '',
-      originalUrl: '',
-      thumbnailUrl: '',
-    };
+  async getImageDetailById(imageId: string): Promise<IImageEntity> {
+    const response = await this.pool.request({
+      method: 'GET',
+      path: `/client/v4/accounts/${
+        getConfig().CLOUDFLARE_ACCOUNT
+      }/images/v1/${imageId}`,
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${getConfig().CLOUDFLARE_TOKEN}`,
+      },
+    });
+
+    try {
+      const result = imageDetailResponseZodSchema.parse(
+        await response.body.json(),
+      );
+
+      return {
+        id: result.result.id,
+        url: result.result.variants[0],
+      };
+    } catch (error) {
+      throw new ImageInvalidException();
+    }
   }
 }

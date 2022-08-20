@@ -5,6 +5,7 @@ const KeyMessage = {
   userNotfoundOrPasswordWrong:
     'Either the user does not exist or the password is not valid.',
   userNotfound: 'user was not found',
+  invalidImage: 'invalid image',
 };
 
 export type MessageKey = keyof typeof KeyMessage;
