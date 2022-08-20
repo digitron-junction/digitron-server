@@ -8,3 +8,12 @@ export class ProductNotExistsException extends ServiceException {
     });
   }
 }
+
+export class NoPermissionToUpdateProductException extends ServiceException {
+  constructor() {
+    super({
+      code: 'noPermission',
+      messageKey: 'noPermissionToUpdateProduct',
+    });
+  }
+}

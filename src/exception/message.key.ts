@@ -8,6 +8,7 @@ const KeyMessage = {
   invalidImage: 'invalid image',
   onlyStoreAccountAccess: 'only store account can access',
   productNotExists: 'product not exists',
+  noPermissionToUpdateProduct: 'you cannot update product',
 };
 
 export type MessageKey = keyof typeof KeyMessage;

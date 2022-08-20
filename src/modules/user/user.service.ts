@@ -48,10 +48,10 @@ export class UserService {
   async signup(args: z.infer<typeof signupUserZodSchema>) {
     const [emailExistsUser, nicknameExistsUser] = await Promise.all([
       this.prismaService.user.findFirst({
-        where: { email: args.email },
+        where: { email: args.email, deletedAt: null },
       }),
       this.prismaService.user.findFirst({
-        where: { nickname: args.nickname },
+        where: { nickname: args.nickname, deletedAt: null },
       }),
     ]);
 
@@ -121,7 +121,7 @@ export class UserService {
 
   async signin({ email, password }: { email: string; password: string }) {
     const user = await this.prismaService.user.findFirst({
-      where: { email },
+      where: { email, deletedAt: null },
     });
 
     if (user === null) {
@@ -139,7 +139,7 @@ export class UserService {
 
   async getUserById(userId: number) {
     const user = await this.prismaService.user.findFirst({
-      where: { id: userId },
+      where: { id: userId, deletedAt: null },
       include: {
         store: true,
       },
@@ -154,7 +154,7 @@ export class UserService {
 
   async getUserByAuthToken(authToken: string) {
     const user = await this.prismaService.user.findFirst({
-      where: { authToken },
+      where: { authToken, deletedAt: null },
       include: {
         store: true,
       },

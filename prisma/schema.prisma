@@ -23,7 +23,6 @@ model user {
   store        store?
   // consumer consumer?
   productLikes productLike[]
-  comment      comment[]
   review       review[]
 
   @@index([authToken])
@@ -61,14 +60,15 @@ model store {
 model product {
   id Int @id @default(autoincrement())
 
-  name          String @db.VarChar(255)
+  name          String  @db.VarChar(255)
   images        Json
-  category      String @db.VarChar(100)
-  subCategory   String @map("sub_category") @db.VarChar(100)
+  category      String  @db.VarChar(100)
+  subCategory   String  @map("sub_category") @db.VarChar(100)
   price         Int
-  originalPrice Int    @map("original_price")
-  descrption    String @db.VarChar(255)
-  storeId       Int    @map("store_id")
+  originalPrice Int     @map("original_price")
+  descrption    String  @db.VarChar(255)
+  storeId       Int     @map("store_id")
+  nftMinted     Boolean @default(false)
 
   store store @relation(fields: [storeId], references: [id])
 
@@ -79,7 +79,6 @@ model product {
   order        order[]
   productLikes productLike[]
   review       review[]
-  comment      comment[]
 }
 
 model productLike {
@@ -102,22 +101,7 @@ model review {
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
-
-  writer  user    @relation(fields: [userId], references: [id])
-  product product @relation(fields: [productId], references: [id])
-
-  @@unique([productId, userId])
-}
-
-model comment {
-  id        Int    @id @default(autoincrement())
-  content   String @db.Text
-  userId    Int    @map("user_id")
-  productId Int    @map("product_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
-  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+  isBuyer   Boolean
 
   writer  user    @relation(fields: [userId], references: [id])
   product product @relation(fields: [productId], references: [id])

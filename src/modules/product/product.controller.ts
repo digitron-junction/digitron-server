@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -14,6 +15,7 @@ import { RequiredStoreUserRequest } from '~/types/request';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
 import {
   CreateProductDto,
+  DeleteProductDto,
   GetProductDto,
   productEntityToDto,
 } from './product.dto';
@@ -51,6 +53,27 @@ export class ProductController {
   @Get('/:productId')
   async getProduct(@Param() { productId }: GetProductDto) {
     const product = await this.productService.getProductById(productId);
+    return {
+      data: {
+        product: await productEntityToDto(product, {
+          cloudflareService: this.cloudflareService,
+        }),
+      },
+    };
+  }
+
+  @UseGuards(RequiredStoreUserGuard)
+  @ApiHeader(requiredUserHeader)
+  @Delete('/:productId')
+  async deleteProduct(
+    @Param() { productId }: DeleteProductDto,
+    @Req() req: RequiredStoreUserRequest,
+  ) {
+    const product = await this.productService.deleteProductById(
+      productId,
+      req.user.store.id,
+    );
+
     return {
       data: {
         product: await productEntityToDto(product, {

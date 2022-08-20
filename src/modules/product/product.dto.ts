@@ -113,3 +113,13 @@ export class GetProductDto {
   @IsNumber()
   productId!: number;
 }
+
+export class DeleteProductDto {
+  @ApiProperty({
+    description: 'product id',
+    required: true,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  productId!: number;
+}

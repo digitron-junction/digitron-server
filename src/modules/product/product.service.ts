@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
 import { ImageInvalidException } from '~/exception/service-exception/image.exception';
-import { ProductNotExistsException } from '~/exception/service-exception/product.exception';
+import {
+  NoPermissionToUpdateProductException,
+  ProductNotExistsException,
+} from '~/exception/service-exception/product.exception';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -46,6 +49,7 @@ export class ProductService {
     const product = await this.prismaService.product.findFirst({
       where: {
         id: productId,
+        deletedAt: null,
       },
       include: {
         store: true,
@@ -63,6 +67,7 @@ export class ProductService {
     const products = await this.prismaService.product.findMany({
       where: {
         storeId,
+        deletedAt: null,
       },
       orderBy: {
         id: 'desc',
@@ -73,5 +78,36 @@ export class ProductService {
     });
 
     return products;
+  }
+
+  async deleteProductById(productId: number, userStoreId: number) {
+    const preProduct = await this.prismaService.product.findFirst({
+      where: {
+        id: productId,
+        deletedAt: null,
+      },
+    });
+
+    if (preProduct === null) {
+      throw new ProductNotExistsException();
+    }
+
+    if (preProduct.storeId !== userStoreId) {
+      throw new NoPermissionToUpdateProductException();
+    }
+
+    const product = await this.prismaService.product.update({
+      data: {
+        deletedAt: new Date(),
+      },
+      where: {
+        id: productId,
+      },
+      include: {
+        store: true,
+      },
+    });
+
+    return product;
   }
 }
