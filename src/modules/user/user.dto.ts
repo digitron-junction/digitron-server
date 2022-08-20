@@ -125,7 +125,7 @@ const userResponseZodSchema = z.object({
   email: z.string(),
   createdAt: z.date(),
   kind: z.nativeEnum(UserKind).transform(dbUserKindToDto),
-  store: storeZodSchema.nullable(),
+  store: storeZodSchema.nullable().optional().default(null),
 });
 
 export const userEntityToDto = (
@@ -134,10 +134,12 @@ export const userEntityToDto = (
 ) => {
   return userResponseZodSchema.parse({
     ...user,
-    store: {
-      ...user.store,
-      image: attach?.storeImage,
-    },
+    store: user.store
+      ? {
+          ...user.store,
+          image: attach?.storeImage,
+        }
+      : null,
   });
 };
 

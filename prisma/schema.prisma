@@ -69,6 +69,7 @@ model product {
   descrption    String  @db.VarChar(255)
   storeId       Int     @map("store_id")
   nftMinted     Boolean @default(false)
+  stock         Int
 
   store store @relation(fields: [storeId], references: [id])
 
@@ -94,7 +95,7 @@ model productLike {
 model review {
   id        Int    @id @default(autoincrement())
   content   String @db.Text
-  userId    Int    @map("user_id")
+  writerId  Int    @map("writer_id")
   productId Int    @map("product_id")
   rating    Int
 
@@ -103,10 +104,10 @@ model review {
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
   isBuyer   Boolean
 
-  writer  user    @relation(fields: [userId], references: [id])
+  writer  user    @relation(fields: [writerId], references: [id])
   product product @relation(fields: [productId], references: [id])
 
-  @@unique([productId, userId])
+  @@unique([productId, writerId])
 }
 
 model order {
