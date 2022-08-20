@@ -20,8 +20,11 @@ model user {
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
 
-  store store?
+  store        store?
   // consumer consumer?
+  productLikes productLike[]
+  comment      comment[]
+  review       review[]
 
   @@index([authToken])
 }
@@ -34,13 +37,18 @@ enum UserKind {
 model store {
   id            Int     @id @default(autoincrement())
   name          String  @db.VarChar(255)
-  imageUrl      String? @map("image_url") @db.VarChar(255)
+  imageId       String? @map("image_id") @db.VarChar(255)
   descrption    String  @db.Text()
   address       String  @db.VarChar(255)
   storeCategory String  @map("store_category") @db.VarChar(255)
 
-  userId Int  @unique @map("user_id")
-  user   user @relation(fields: [userId], references: [id])
+  userId  Int       @unique @map("user_id")
+  user    user      @relation(fields: [userId], references: [id])
+  product product[]
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
 }
 
 // model consumer {
@@ -51,14 +59,69 @@ model store {
 // }
 
 model product {
-  id      Int @id @default(autoincrement())
-  orderId Int @map("order_id")
+  id            Int    @id @default(autoincrement())
+  orderId       Int    @map("order_id")
+  name          String @db.VarChar(255)
+  images        Json
+  category      String @db.VarChar(100)
+  subCategory   String @db.VarChar(100)
+  price         Int
+  originalPrice Int
+  descrption    String @db.VarChar(255)
+  storeId       Int
+
+  store store @relation(fields: [storeId], references: [id])
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
 
-  order order[]
+  order        order[]
+  productLikes productLike[]
+  review       review[]
+  comment      comment[]
+}
+
+model productLike {
+  userId    Int
+  productId Int
+  product   product @relation(fields: [productId], references: [id])
+  user      user    @relation(fields: [userId], references: [id])
+
+  @@unique([productId, userId])
+}
+
+model review {
+  id        Int    @id @default(autoincrement())
+  content   String @db.Text
+  userId    Int
+  productId Int
+  rating    Int
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  writer  user    @relation(fields: [userId], references: [id])
+  product product @relation(fields: [productId], references: [id])
+
+  @@unique([productId, userId])
+}
+
+model comment {
+  id        Int    @id @default(autoincrement())
+  content   String @db.Text
+  userId    Int
+  productId Int
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  writer  user    @relation(fields: [userId], references: [id])
+  product product @relation(fields: [productId], references: [id])
+
+  @@unique([productId, userId])
 }
 
 model order {

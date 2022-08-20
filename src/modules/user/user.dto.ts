@@ -9,7 +9,9 @@ import {
   IsString,
 } from 'class-validator';
 import { z } from 'zod';
+import { IImageEntity } from '~/entity/image.entity';
 import { UserKindEnum } from '~/entity/user.entity';
+import { imageEntityZodSchema } from '../image/image.dto';
 
 export class SignUpDto {
   @ApiProperty({
@@ -48,7 +50,7 @@ export class SignUpDto {
   })
   @IsOptional()
   @IsString()
-  storeImageUrl?: string;
+  storeImageId?: string;
 
   @ApiProperty({
     required: false,
@@ -108,16 +110,25 @@ const userResponseZodSchema = z.object({
     .object({
       id: z.number(),
       name: z.string(),
-      imageUrl: z.string().nullable(),
       descrption: z.string(),
       address: z.string(),
       storeCategory: z.string(),
+      image: imageEntityZodSchema.optional().nullable().default(null),
     })
     .nullable(),
 });
 
-export const userEntityToDto = (user: user) => {
-  return userResponseZodSchema.parse(user);
+export const userEntityToDto = (
+  user: any,
+  attach?: { storeImage?: IImageEntity },
+) => {
+  return userResponseZodSchema.parse({
+    ...user,
+    store: {
+      ...user.store,
+      image: attach?.storeImage,
+    },
+  });
 };
 
 const authTokenReponseZodSchema = z.object({
@@ -136,16 +147,25 @@ const otherUserResponseZodSchema = z.object({
     .object({
       id: z.number(),
       name: z.string(),
-      imageUrl: z.string().nullable(),
       descrption: z.string(),
       address: z.string(),
       storeCategory: z.string(),
+      image: imageEntityZodSchema.optional().nullable().default(null),
     })
     .nullable(),
 });
 
-export const otherUserEntityToDto = (user: user) => {
-  return otherUserResponseZodSchema.parse(user);
+export const otherUserEntityToDto = (
+  user: any,
+  attach?: { storeImage?: IImageEntity },
+) => {
+  return otherUserResponseZodSchema.parse({
+    ...user,
+    store: {
+      ...user.store,
+      image: attach?.storeImage,
+    },
+  });
 };
 
 export class GetOneUserDto {

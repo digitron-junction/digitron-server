@@ -87,7 +87,7 @@ export class UserService {
             store: {
               create: {
                 name: _args.storeName,
-                imageUrl: _args.storeImageUrl,
+                imageId: _args.storeImageId,
                 descrption: _args.storeDescription,
                 address: _args.storeAddress,
                 storeCategory: _args.storeCategory,

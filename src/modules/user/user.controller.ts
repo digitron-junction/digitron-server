@@ -32,7 +32,7 @@ export const signupUserZodSchema = z.union([
     nickname: z.string(),
     email: z.string(),
     password: z.string(),
-    storeImageUrl: z.string().optional().nullable(),
+    storeImageId: z.string().optional().nullable(),
     storeName: z.string(),
     storeDescription: z.string(),
     storeAddress: z.string(),

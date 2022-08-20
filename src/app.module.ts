@@ -10,6 +10,8 @@ import { UserModule } from './modules/user/user.module';
 import { winstonConfig } from './config/winston.config';
 import { RavenInterceptor } from 'nest-raven';
 import { RavenOption } from './config/raven.config';
+import { CloudflareModule } from './modules/cloudflare/cloudflare.module';
+import { ImageModule } from './modules/image/image.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { RavenOption } from './config/raven.config';
     PrismaModule,
     UserModule,
     WinstonModule.forRoot(winstonConfig),
+    CloudflareModule,
+    ImageModule,
   ],
   controllers: [AppController],
   providers: [

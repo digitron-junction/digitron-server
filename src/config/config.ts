@@ -5,6 +5,9 @@ const configZodSchema = z.object({
   DATABASE_URL: z.string(),
   PASSWORD_HASH_SALT_ROUND: ze.intString().transform(Number),
   SENTRY_DSN: z.string().optional(),
+  CLOUDFLARE_IMAGE_ORIGIN: z.string().url(),
+  CLOUDFLARE_TOKEN: z.string(),
+  CLOUDFLARE_ACCOUNT: z.string(),
 });
 
 let config: z.infer<typeof configZodSchema> | null = null;
